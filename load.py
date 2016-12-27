@@ -5,6 +5,7 @@ import string
 
 from collections import defaultdict
 
+import unicodecsv
 from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter, PDFConverter
@@ -131,10 +132,16 @@ class LeerdamConverter(PDFConverter):
             for key in record.keys():
                 headers.add(key)
 
-        print(','.join(headers))
-        for record_dict in self.records:
-            record = defaultdict(str, record_dict)
-            print(','.join(['"{}"'.format(record[field]) for field in headers]))
+        with open(path, 'wb') as csv_file:
+            csv_writer = unicodecsv.writer(csv_file)
+
+            csv_writer.writerow(list(headers))
+            for record_dict in self.records:
+                record = defaultdict(str, record_dict)
+                try:
+                    csv_writer.writerow([record[field] for field in headers])
+                except Exception as e:
+                    print(e.message)
 
 
 def convert_pdf_to_txt(path):
@@ -153,6 +160,6 @@ def convert_pdf_to_txt(path):
         interpreter.process_page(page)
     fp.close()
     device.close()
-    device.save_csv('')
+    device.save_csv('ld1721.csv')
 
-print convert_pdf_to_txt('/home/eh/Downloads/ld1670.pdf')
+print convert_pdf_to_txt('/home/eh/Downloads/ld1721.pdf')

@@ -1,1 +1,2 @@
 pdfminer==20140328
+unicodecsv==0.14.1
